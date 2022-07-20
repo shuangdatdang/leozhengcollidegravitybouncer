@@ -78,6 +78,8 @@ function draw(){
             bubbles[i].speedX = bubbles[i].speedX * - 1
         }
     }
+    drawPlayer();
+    movePlayer();
     requestAnimationFrame(draw);
 }
 
@@ -105,7 +107,7 @@ function drawBubble(aBubble){
 function moveBubble(aBubble){
         aBubble.speed += aBubble.accel;
         if(aBubble.speed < -5){
-            aBubble.speed = -5
+            aBubble.speed = -5;
         }
     aBubble.y += aBubble.speed;
     aBubble.x += aBubble.speedX;
@@ -123,7 +125,40 @@ function mouseupHandler() {
 }
 function bubbleClicked(aBubble) {
     if (dist(mouseX, mouseY, aBubble.x - aBubble.r * 1.8, aBubble.y) < aBubble.r && mouseIsPressed) {
-        aBubble.speed += -1
-        aBubble.speedX = randomInt(-1,2)
+        aBubble.speed += -1;
+        aBubble.speedX = randomInt(-1,2);
     }
+}
+let player = {
+    x: cnv.width/2,
+    y: cnv.height/2,
+    r: 15,
+    color: "white",
+    ps: 0,
+    pa: 0.1
+}
+function drawPlayer(){
+    fill(player.color);
+    circle(player.x,player.y,player.r,"fill");
+}
+let moveLeft =  false;
+let moveRight= false;
+let moveUp = false;
+document.addEventListener("keydown",(moveP));
+function moveP(event){
+    switch (event.key){
+        case "ArrowUp": moveUp = true; break;
+        case "ArrowLeft": moveLeft = true; break;
+        case "ArrowRight": moveRight = true; break;
+    }
+}
+
+
+function movePlayer(){
+    player.ps += player.pa
+    player.y += player.ps
+    if(player.y + player.r > cnv.height ){
+        player.y = cnv.height - player.r
+    }
+
 }
