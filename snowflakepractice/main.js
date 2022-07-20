@@ -45,7 +45,7 @@ function dist(x1, y1, x2, y2) {
 let mouseX;
 let mouseY;
 let bubbles = [];
-for (let n = 1; n < 15; n++){
+for (let n = 1; n < 10; n++){
     bubbles.push(newRandomBubble());
 }
 function more(){
@@ -61,10 +61,10 @@ function draw(){
     for (let i = 0; i < bubbles.length; i++){
         moveBubble(bubbles[i]);
         drawBubble(bubbles[i]);
-        bubbleClicked(bubbles[i]);
+        bubbleCollide(bubbles[i]);
         if (bubbles[i].y + bubbles[i].r  >= cnv.height){
             bubbles[i].y = cnv.height -bubbles[i].r
-            bubbles[i].speed = bubbles[i].speed * -0.97
+            bubbles[i].speed = bubbles[i].speed * -1
         }
         if (bubbles[i].y < -200){
             bubbles[i].y = -199
@@ -91,7 +91,7 @@ function newRandomBubble(){
         color: randomRGB(),
         speed: 0,
         accel: 0.05,
-        speedX: randomInt(-1, 2)
+        speedX: randomInt(-0.5, 1.5)
     };
 }
 function randomInt(low,high){
@@ -112,21 +112,10 @@ function moveBubble(aBubble){
     aBubble.y += aBubble.speed;
     aBubble.x += aBubble.speedX;
 }
-document.addEventListener("mousedown", mousedownHandler);
-document.addEventListener("mouseup", mouseupHandler);
-let mouseIsPressed = false;
-function mousedownHandler(event) {
-    mouseIsPressed = true;
-    mouseX = event.clientX - cnv.width/2;
-    mouseY = event.clientY;
-}
-function mouseupHandler() {
-    mouseIsPressed = false;
-}
-function bubbleClicked(aBubble) {
-    if (dist(mouseX, mouseY, aBubble.x - aBubble.r * 1.8, aBubble.y) < aBubble.r && mouseIsPressed) {
-        aBubble.speed += -1;
-        aBubble.speedX = randomInt(-1,2);
+
+function bubbleCollide(aBubble) {
+    if (dist(player.x, player.y, aBubble.x, aBubble.y) < player.r + aBubble.r && moveUp) {
+        aBubble.speed += player.ps;
     }
 }
 let player = {
@@ -141,24 +130,49 @@ function drawPlayer(){
     fill(player.color);
     circle(player.x,player.y,player.r,"fill");
 }
+let moveUp = false;
 let moveLeft =  false;
 let moveRight= false;
-let moveUp = false;
 document.addEventListener("keydown",(moveP));
 function moveP(event){
     switch (event.key){
-        case "ArrowUp": moveUp = true; break;
+        case "ArrowUp": player.ps += -8; moveUp = true; break;
         case "ArrowLeft": moveLeft = true; break;
         case "ArrowRight": moveRight = true; break;
     }
 }
-
+document.addEventListener("keyup",(dontMoveP));
+function dontMoveP(event){
+    switch (event.key){
+        case "ArrowUp": moveUp = false; break;
+        case "ArrowLeft": moveLeft = false; break;
+        case "ArrowRight": moveRight = false; break;
+    }
+}
 
 function movePlayer(){
     player.ps += player.pa
     player.y += player.ps
+    if(player.ps > 4){
+        player.ps = 4
+    }else if(player.ps < -5){
+        player.ps = -5
+    }
     if(player.y + player.r > cnv.height ){
         player.y = cnv.height - player.r
     }
-
+    if(player.y < -200){
+        player.y = -200;
+        player.ps *= -1
+    }
+    if (moveLeft){
+        player.x += -3
+    }else if(moveRight){
+        player.x += 3
+    }
+    if(player.x - player.r<0) {
+        player.x = player.r
+    }else if(player.x + player.r > cnv.width){
+        player.x = cnv.width - player.r
+    }
 }
